@@ -1,0 +1,18 @@
+{
+  "name": "nbp-redis-projekat",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app"
+  },
+  "author": "Andrija M",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "body-parser": "^1.19.1",
+    "express": "^4.17.2",
+    "express-handlebars": "^6.0.2",
+    "method-override": "^3.0.0",
+    "redis": "^4.0.1"
+  }
+}
