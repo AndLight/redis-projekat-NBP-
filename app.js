@@ -35,56 +35,24 @@ app.use(express.static(path.join(__dirname, '/public')));
 		
 // methodOverride
     app.use(methodOverride('_method')); //delete request na formi koristi _method parametar
-
-// Home Page
-    // app.get('/', function(req, res){
-    //     res.render('home');            
-    //         //homepage is going to render homepage
-    //         //handlebar in views
-    // });
     
 ///////////////////////////////////////////////////////
-
-const obrisi = () =>{
-    return [
-        {
-            name: "jedan"
-        },
-        {
-            name: "dva"
-        }
-    ]
-};
-
-
-// app.get('/', function(req, res){
-//     res.render('home', {lista: obrisi});
-// });
-
-// //SET
-
-//     app.get('/', function(req, res){
-//         client.rPush('todo', "get vrednost")
-//     });
-
-//GET
-
-    //  (async () =>{
-    //     lista =  await client.lrange('todo', 0, -1);
-    //     console.log(lista)
-    //  })
-    
+// Home Page
     app.get('/', function(req, res){
 
-        client.rPush('todo', "jedan get");
-        client.rPush('todo', "dva get");
-
-        client.lRange('todo', 0, -1, function(err, reply){ 
-                console.log("REPLY ******* "+reply)          
-                res.render('home', {tasks: reply})
-        })
-        // res.render('home', {obrisia: obrisi});
+        // client.rPush('todo', "jedan get");
+        // client.rPush('todo', "dva get");
+        
+        console.log("lRange: " +
+            client.lRange('todo', 0, 1, function(err, reply){}
+                ).then(reply => {
+                    console.log("REPLY ******* "+reply);          
+                    res.render('home', {tasks: reply});
+                }
+        ));
     });
+
+// End Home Page
 
 ///////////////////////////////////////////////////////
 
