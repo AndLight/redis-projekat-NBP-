@@ -60,6 +60,7 @@ app.use(express.static(path.join(__dirname, '/public')));
         res.redirect('/');
     });
 
+    
     app.post("/task/delete", function(req, res){
         let del = req.body.task;
         console.log("del "+ del)
