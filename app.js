@@ -60,7 +60,6 @@ app.use(express.static(path.join(__dirname, '/public')));
         res.redirect('/');
     });
 
-    
     app.post("/task/delete", function(req, res){
         let del = req.body.task;
         console.log("del "+ del)
@@ -111,6 +110,21 @@ app.use(express.static(path.join(__dirname, '/public')));
         })
         // )
         // res.redirect('/');
+    });
+
+    //Render home page
+        app.get('/', function(req, res, next){
+            res.render('/');
+        });
+
+    //Add user 
+        app.get('/task/adduser', function(req, res, next){
+            res.render('adduser');
+        });
+
+    //Game
+    app.get('/task/game', function(req, res, next){
+        res.render('game');
     });
 // End Home Page
 
