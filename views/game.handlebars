@@ -1,1 +1,28 @@
-this is game
+<link rel="stylesheet" href="style.css">
+{{#if error}} <span>{{error}}</span>{{/if}}
+<h1> PI game </h1>
+
+<form method="POST" action="/game"></form>
+
+    {{!-- <input type="text" name="name" placeholder="Name"></input>
+    <br>
+    <input type="text" name="lastName" placeholder="Last Name"></input>
+    <br>
+    <input type="text" name="number" placeholder="Numbers of Pi"></input>
+    <br> --}}
+    <div class="form-group">
+        <input type="text" name="name" class="form-control" placeholder="Name">
+    </div>
+    <div class="form-group">
+        <input type="text" name="lastName" class="form-control" placeholder="lastName">
+    </div>
+    <div class="form-group">
+        <input type="text" name="email" class="form-control" placeholder="Email Address">
+    </div>
+    <div class="form-group">
+        <input type="text" name="number" class="form-control" placeholder="Numbers of Pi">
+    </div>
+
+    <input type="submit" class="btn btn-primary form-control" value="Save">
+    
+</form>
