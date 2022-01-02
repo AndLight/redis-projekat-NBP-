@@ -20,34 +20,13 @@ const client = redis.createClient({
 		
 // Init app
 	const app = express();
-	
-//Handlebars.registerHelper
-// const hbs = exphbs.create({
-//     defaultLayout:'index',
-
-//     //custom helpers
-//     // helpers:{
-//     //     points: function(x, options){
-//     //         let score = 0;
-//     //         for(let i=0; i<x.length; i++){
-//     //             if(PI[i] === x[i]){
-//     //                 score++;
-//     //             }
-//     //             else{
-//     //                 return score;
-//     //             }
-//     //         }
-//     //         return score;
-//     //     }
-//     // }
-// })
-// app.engine('handlebars', hbs.engine);
 	    
 
 // Sets our app to use the handlebars engine
 app.engine('handlebars', exphbs.engine({defaultLayout:'index'})); // layout je index.handlebars u views
 app.set('view engine', 'handlebars');
-// app.use(express.static(path.join(_s_dirname, '/public')));
+app.use(express.static(path.join(__dirname, '/public')));
+app.use(express.static(path.join('/public')));
 app.use(express.static('public'));
 
 
@@ -112,7 +91,7 @@ app.use(express.static('public'));
         });
 
     //Game
-    app.get('/game', function(req, res, next){ 
+    app.get('/user/game', function(req, res, next){ 
         res.render('game');
     });
 
@@ -121,45 +100,52 @@ app.use(express.static('public'));
 //Game page
 
 const PI = "3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679821480865132823066470938446095505822317253594081284811174502841027019385211055596446229489549303819644288109756659334461284756482337867831652712019091456485669234603486104543266482133936072602491412737245870066063155881748815209209628292540917153643678925903600113305305488204665213841469519415116094330572703657595919530921861173819326117931051185480744623799627495673518857527248912279381830119491298336733624406566430860213949463952247371907021798609437027705392171762931767523846748184676694051320005681271452635608277857713427577896091736371787214684409012249534301465495853710507922796892589235420199561121290219608640344181598136297747713099605187072113499999983729780499510597317328160963185950244594553469083026425223082533446850352619311881710100031378387528865875332083814206171776691473035982534904287554687311595628638823537875937519577818577805321712268066130019278766111959092164201989";
-
-app.post('/game', function(req, res, next){
-    console.log("radi dugme")
-
-    let name = req.body.name;
-    let lastname = req.body.lastname;
-    let email = req.body.email;
-    let number = req.body.number;
-    
-    let counter= 5;
-    // ()=>{
-    //     let br=0;
-    //     for(let i=0; i<number.length;i++){
-    //         if(PI[i]===number[i]){
-    //             br++;
-    //         }
-    //         else{
-    //             console.log('for '+ br)
-    //             return br;
-    //         }
-    //     }
-    //     console.log('end '+ br)
-    //     return br;
-    // }
-    // console.log("counter "+ counter);
-    
-    client.hmset(email, [
-        'name', name,
-        'lastname', lastname,
-        'email', email,
-        'score', counter
-    ], function(err, reply){
-        if(err){
-          console.log(err);
+function countPI(pi_value){
+    let br=0;
+    for(let i=0; i<pi_value.length;i++){
+        if(PI[i]===pi_value[i]){
+            br++;
         }
-        console.log(reply);
-        
-        res.redirect('/');
-    });
+        else{
+            return br;
+        }
+    }
+    return br;
+};
+
+app.post('/user/game', function(req, res, next){
+    
+    let player_name = req.body.player_name;
+    let pi_value = req.body.pi_value;
+    pi_value = pi_value.toString();
+    // console.log('player_name: '+ player_name+" " +"pi_value: "+pi_value)
+    console.log('player_name: '+ player_name+" type "+ typeof(player_name));
+    let score= countPI(pi_value);
+    console.log("score "+ score +" type: "+typeof(score));
+
+    client.ZADD("scores", score, player_name);
+
+    // let rank;
+    // client.zRevRank("scores", player_name, function(err, reply){}
+    //     ).then(reply => {
+    //         rank=reply;
+    //     })
+
+    // console.log("rank: "+ rank)
+
+    // client.hSet(player_name, [
+    //   'pi_value', pi_value
+    // ], function(err, reply){
+    //   if(err){
+    //     console.log(err);
+    //   }
+    //   console.log(reply);
+    // });
+    //nazad na homepage
+    
+
+
+    res.redirect('/user/game');
 });
 
 
@@ -167,13 +153,12 @@ app.post('/game', function(req, res, next){
 ///////////////////////////////////////////////////////
 //user page
 app.post('/user/add', function(req, res, next){
-    let id = req.body.id;
     let first_name = req.body.first_name;
     let last_name = req.body.last_name;
     let email = req.body.email;
     let phone = req.body.phone;
   
-    client.hmset(id, [
+    client.hSet(email, [
       'first_name', first_name,
       'last_name', last_name,
       'email', email,
@@ -183,9 +168,38 @@ app.post('/user/add', function(req, res, next){
         console.log(err);
       }
       console.log(reply);
-      //nazad na homepage
-      res.redirect('/');
+      
     });
+    //nazad na homepage
+    res.redirect('/user/add');
+  });
+
+  //Search user
+  app.post('/user/search', function(req, res, next){
+    let id = req.body.id;
+
+    client.hGetAll(id, function(err, obj){}
+    ).then((obj) => {
+
+        if(!obj.email){
+            res.render('adduser', {
+            errorSearch: 'User does not exist'
+            });
+        } else {
+            obj.email = id;
+            res.render('details', {
+            user: obj
+            });
+        }
+    });
+
+    // Delete User
+    app.delete('/user/delete/:email', function(req, res, next){
+        client.del(req.params.email);
+        res.redirect('/');
+    });
+
+
   });
 //end user page
 //////////////////////////////////////////////////////

@@ -1,28 +1,23 @@
-<link rel="stylesheet" href="style.css">
-{{#if error}} <span>{{error}}</span>{{/if}}
 <h1> PI game </h1>
 
-<form method="POST" action="/game"></form>
+{{#if error}} <span>{{error}}</span>{{/if}}
 
-    {{!-- <input type="text" name="name" placeholder="Name"></input>
-    <br>
-    <input type="text" name="lastName" placeholder="Last Name"></input>
-    <br>
-    <input type="text" name="number" placeholder="Numbers of Pi"></input>
-    <br> --}}
-    <div class="form-group">
-        <input type="text" name="name" class="form-control" placeholder="Name">
-    </div>
-    <div class="form-group">
-        <input type="text" name="lastName" class="form-control" placeholder="lastName">
-    </div>
-    <div class="form-group">
-        <input type="text" name="email" class="form-control" placeholder="Email Address">
-    </div>
-    <div class="form-group">
-        <input type="text" name="number" class="form-control" placeholder="Numbers of Pi">
-    </div>
+<h1>Add User</h1>
 
-    <input type="submit" class="btn btn-primary form-control" value="Save">
-    
+{{#if error}} <span>{{error}}</span>{{/if}}
+
+<form method="POST" action="/user/game">
+
+  <div class="form-group">
+    <label>Name</label>
+    <input type="text" name="player_name" class="form-control" placeholder="Name">
+  </div>
+
+  <div class="form-group">
+    <label>Pi value</label>
+    <input type="text" name="pi_value" class="form-control" placeholder="Pi value">
+  </div>
+
+  <input type="submit" class="btn btn-primary" value="Save">
+
 </form>
