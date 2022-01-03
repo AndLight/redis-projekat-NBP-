@@ -5,6 +5,7 @@ const methodOverride = require('method-override');
 const exphbs = require('express-handlebars');
 const path = require('path');
 
+//#region [rgba (0,128,128, 0.1)] SETUP
 // Create Redis Client
 const client = redis.createClient({
     host: "redis-server",
@@ -12,7 +13,7 @@ const client = redis.createClient({
     });
     
     client.on('error', (err) => console.log('Redis server Error', err));
-    client.on('connect', ()=>console.log('Redis server povezan'));  
+    client.on('connect', ()=>console.log('Redis server conected'));  
     client.connect();
     
 // Set Port
@@ -21,7 +22,6 @@ const client = redis.createClient({
 // Init app
 	const app = express();
 	    
-
 // Sets our app to use the handlebars engine
 app.engine('handlebars', exphbs.engine({defaultLayout:'index'})); // layout je index.handlebars u views
 app.set('view engine', 'handlebars');
@@ -29,16 +29,16 @@ app.use(express.static(path.join(__dirname, '/public')));
 app.use(express.static(path.join('/public')));
 app.use(express.static('public'));
 
-
-
 // body-parser
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({extended:false}));
 		
 // methodOverride
     app.use(methodOverride('_method')); //delete request na formi koristi _method parametar
-    
+
+//#endregion
 ///////////////////////////////////////////////////////
+//#region [rgba (255 ,0 ,0 , 0.1)] HOME
 // Home Page
     app.get('/', function(req, res){
 
@@ -96,7 +96,9 @@ app.use(express.static('public'));
     });
 
 // End Home Page
+//#endregion
 ///////////////////////////////////////////////////////
+//#region [rgba (0,0,255, 0.1)] GAME
 //Game page
 
 const PI = "3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679821480865132823066470938446095505822317253594081284811174502841027019385211055596446229489549303819644288109756659334461284756482337867831652712019091456485669234603486104543266482133936072602491412737245870066063155881748815209209628292540917153643678925903600113305305488204665213841469519415116094330572703657595919530921861173819326117931051185480744623799627495673518857527248912279381830119491298336733624406566430860213949463952247371907021798609437027705392171762931767523846748184676694051320005681271452635608277857713427577896091736371787214684409012249534301465495853710507922796892589235420199561121290219608640344181598136297747713099605187072113499999983729780499510597317328160963185950244594553469083026425223082533446850352619311881710100031378387528865875332083814206171776691473035982534904287554687311595628638823537875937519577818577805321712268066130019278766111959092164201989";
@@ -107,24 +109,31 @@ function countPI(pi_value){
             br++;
         }
         else{
+            // return String(br);
             return br;
         }
     }
+    // return String(br);
     return br;
 };
 
 app.post('/user/game', function(req, res, next){
     
     let player_name = req.body.player_name;
+    // player_name = '\"'+player_name+'\"';
     let pi_value = req.body.pi_value;
-    pi_value = pi_value.toString();
-    // console.log('player_name: '+ player_name+" " +"pi_value: "+pi_value)
-    console.log('player_name: '+ player_name+" type "+ typeof(player_name));
+        // pi_value = pi_value.toString();
+        // console.log('player_name: '+ player_name+" " +"pi_value: "+pi_value)
+        console.log("////////////////////////////////////////")
+        console.log('player_name: '+ player_name+" type: "+ typeof(player_name));
     let score= countPI(pi_value);
-    console.log("score "+ score +" type: "+typeof(score));
-
-    client.ZADD("scores", score, player_name);
-
+    score = String(score);
+    // score = "" + score;
+        console.log("score: "+ score +" type: "+typeof(score));
+        console.log("////////////////////////////////////////")
+    
+    // client.ZADD("scores", score, player_name);
+    client.zAdd("scores", score, player_name);
     // let rank;
     // client.zRevRank("scores", player_name, function(err, reply){}
     //     ).then(reply => {
@@ -141,7 +150,6 @@ app.post('/user/game', function(req, res, next){
     //   }
     //   console.log(reply);
     // });
-    //nazad na homepage
     
 
 
@@ -150,7 +158,9 @@ app.post('/user/game', function(req, res, next){
 
 
 //End game page
+//#endregion
 ///////////////////////////////////////////////////////
+//#region [rgba(0, 205, 30, 0.1)] USER PAGE
 //user page
 app.post('/user/add', function(req, res, next){
     let first_name = req.body.first_name;
@@ -202,6 +212,7 @@ app.post('/user/add', function(req, res, next){
 
   });
 //end user page
+//#endregion
 //////////////////////////////////////////////////////
 
 app.listen(port, function(){
