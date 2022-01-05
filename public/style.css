@@ -5,3 +5,7 @@ body, html{
 .task-list{
     list-style: none;
 }
+
+.ul-next{
+    display:inline-block; float: left;
+}

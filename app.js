@@ -4,6 +4,7 @@ const redis = require('redis');
 const methodOverride = require('method-override');
 const exphbs = require('express-handlebars');
 const path = require('path');
+const { response } = require('express');
 
 //#region [rgba (0,128,128, 0.1)] SETUP
 // Create Redis Client
@@ -25,9 +26,9 @@ const client = redis.createClient({
 // Sets our app to use the handlebars engine
 app.engine('handlebars', exphbs.engine({defaultLayout:'index'})); // layout je index.handlebars u views
 app.set('view engine', 'handlebars');
-app.use(express.static(path.join(__dirname, '/public')));
-app.use(express.static(path.join('/public')));
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, '/public/style.css')));
+// app.use(express.static(path.join('/public')));
+// app.use(express.static('public'));
 
 // body-parser
     app.use(bodyParser.json());
@@ -62,24 +63,6 @@ app.use(express.static('public'));
         res.redirect('/');
     });
 
-    app.post("/task/delete", function(req, res){
-        let del = req.body.task;
-        client.lRange('todo', 0, -1, function(err, todo){
-        }).then((todo) => {
-            let todoLenth; 
-            client.LLEN("todo", function(err, repply){}
-                ).then(reply => {
-                    todoLenth = reply;
-                        for(let i=0; i< todoLenth; i++){
-                            if(del.indexOf(todo[i])> -1){
-                                client.lRem('todo', -2, todo[i], function(){});
-                            }
-                        }
-                })
-            res.redirect('/');
-        })
-    });
-
     //Render home page
         app.get('/', function(req, res, next){
             res.render('/');
@@ -91,9 +74,41 @@ app.use(express.static('public'));
         });
 
     //Game
-    app.get('/user/game', function(req, res, next){ 
-        res.render('game');
-    });
+        app.get('/user/game', function(req, res, next){  
+            
+            let names= [];   
+            let value = [];
+            client.hGetAll("scores", function(err, obj){}
+                ).then((reply)=>{
+                    
+                    
+                        for(i in reply){
+                            // names.push(i);
+                            value.push(reply[i]);
+                            
+                        }
+
+                        //sort
+                        value=value.sort(function(a,b){return(+a)-(+b)});
+                        value.reverse();
+                        console.log('sorted value ' + value)
+
+                        for(let a=0; a<value.length; a++){
+                            for (b in reply){
+                                if(value[a]== reply[b]){
+                                    if(!names.includes(b)){
+                                        names.push(b); 
+                                    }
+                                }
+                            }
+                        }
+                        console.log(names)
+                        
+                })
+                res.render('game', {name: names, value: value});
+            // res.render('game');
+        });
+
 
 // End Home Page
 //#endregion
@@ -109,53 +124,70 @@ function countPI(pi_value){
             br++;
         }
         else{
-            // return String(br);
             return br;
         }
     }
-    // return String(br);
     return br;
 };
 
 app.post('/user/game', function(req, res, next){
     
     let player_name = req.body.player_name;
-    // player_name = '\"'+player_name+'\"';
     let pi_value = req.body.pi_value;
-        // pi_value = pi_value.toString();
-        // console.log('player_name: '+ player_name+" " +"pi_value: "+pi_value)
-        console.log("////////////////////////////////////////")
-        console.log('player_name: '+ player_name+" type: "+ typeof(player_name));
+   
     let score= countPI(pi_value);
-    score = String(score);
-    // score = "" + score;
-        console.log("score: "+ score +" type: "+typeof(score));
-        console.log("////////////////////////////////////////")
     
-    // client.ZADD("scores", score, player_name);
-    client.zAdd("scores", score, player_name);
-    // let rank;
+    // client.zAdd("scores", ""+score, ""+player_name, function (err, reply) {});
     // client.zRevRank("scores", player_name, function(err, reply){}
     //     ).then(reply => {
-    //         rank=reply;
-    //     })
+    //         res.render('/user/game', {rank: reply});
+    //     });
 
-    // console.log("rank: "+ rank)
-
-    // client.hSet(player_name, [
-    //   'pi_value', pi_value
-    // ], function(err, reply){
-    //   if(err){
-    //     console.log(err);
-    //   }
-    //   console.log(reply);
-    // });
-    
-
-
+    if(player_name === "" || pi_value === ""){
+        res.render('game', {
+                            
+            resultInputForGame: 'Please fill in all the fields'
+            }) 
+    }
+    else{
+        client.hExists('scores', player_name, function(err, r){}).then (repy => {
+                
+            if(repy){
+                    // console.log('postoji')
+                    let scoreFile;
+                    
+                    client.hGet('scores', player_name, function(err, result){}
+                    ).then( res =>{
+                        
+                        scoreFile = res;
+                        // console.log("scoreFile: "+ scoreFile)
+                        // console.log("score: "+ score)
+                        if(score  > scoreFile){
+                            client.hSet('scores', player_name, score, function(err, res){}
+                            ).then(()=> {
+                                //console.log('Value is set for player '+ player_name+" to "+ score)
+                                })
+                                
+                            }
+                        });
+                    }
+                    else{
+                        // console.log('ne postoji')
+                        
+                        client.hSet('scores', player_name, score, function(err, res){}
+                        ).then(()=> {//console.log('New player added '+ player_name+" with score "+ score)
+                        })
+                    }
+                    
+                    // res.render('game', {
+                            
+                    //     resultInputForGame: 'Score for player: '+ player_name+" is "+ score
+                    //     }) 
+                    
+                })
+    }
     res.redirect('/user/game');
 });
-
 
 //End game page
 //#endregion
@@ -211,6 +243,24 @@ app.post('/user/add', function(req, res, next){
 
 
   });
+
+  app.post("/task/delete", function(req, res){
+    let del = req.body.task;
+    client.lRange('todo', 0, -1, function(err, todo){
+    }).then((todo) => {
+        let todoLenth; 
+        client.LLEN("todo", function(err, repply){}
+            ).then(reply => {
+                todoLenth = reply;
+                    for(let i=0; i< todoLenth; i++){
+                        if(del.indexOf(todo[i])> -1){
+                            client.lRem('todo', -2, todo[i], function(){});
+                        }
+                    }
+            })
+        res.redirect('/');
+    })
+});
 //end user page
 //#endregion
 //////////////////////////////////////////////////////

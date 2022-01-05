@@ -1,3 +1,4 @@
+
 <h1>Work space</h1>
 {{#if error}} <span>{{error}}</span>{{/if}}
 
@@ -5,7 +6,7 @@
 <div>
   <h3>To do: </h3>
       <form method= "post" action="/task/delete">
-          <ul class="task-list">
+          <ul class="task-list" style="list-style: none;"> 
               {{#each tasks}}
               <li>
                   <input type="checkbox" name="task" value="{{this}}" class="form-check-input" id="flexCheckDefault">

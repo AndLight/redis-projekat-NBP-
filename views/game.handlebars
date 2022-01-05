@@ -1,11 +1,7 @@
 <h1> PI game </h1>
 
 {{#if error}} <span>{{error}}</span>{{/if}}
-
-<h1>Add User</h1>
-
-{{#if error}} <span>{{error}}</span>{{/if}}
-
+{{#if resultInputForGame}} <span>{{resultInputForGame}}</span>{{/if}}
 <form method="POST" action="/user/game">
 
   <div class="form-group">
@@ -21,3 +17,27 @@
   <input type="submit" class="btn btn-primary" value="Save">
 
 </form>
+
+<div>
+  <h3>Score: </h3>
+        <div style="display:inline-block; float: left; ">
+          <ul class="task-list" style="list-style: none;">
+              {{#each name }}
+                  <li>
+                      {{this}} 
+                  </li>
+              {{/each}}
+            </ul>
+        </div>
+        <div style="display:inline-block; float: left;">
+            <ul class="task-list" style="list-style: none;">
+              {{#each value }}
+
+                  <li>
+          
+                      {{this}}
+                  </li>
+                {{/each}}
+          </ul>
+        </div>
+</div>
