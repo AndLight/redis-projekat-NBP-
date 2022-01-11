@@ -24,11 +24,12 @@ const client = redis.createClient({
 	const app = express();
 	    
 // Sets our app to use the handlebars engine
-app.engine('handlebars', exphbs.engine({defaultLayout:'index'})); // layout je index.handlebars u views
-app.set('view engine', 'handlebars');
-app.use(express.static(path.join(__dirname, '/public/style.css')));
-// app.use(express.static(path.join('/public')));
-// app.use(express.static('public'));
+    app.engine('handlebars', exphbs.engine({defaultLayout:'index'})); // layout je index.handlebars u views
+    app.set('view engine', 'handlebars');
+
+    app.use(express.static(path.join(__dirname, '/public')));
+    // app.use(express.static(path.join('/public')));
+    // app.use(express.static('public'));
 
 // body-parser
     app.use(bodyParser.json());
@@ -268,4 +269,5 @@ app.post('/user/add', function(req, res, next){
 app.listen(port, function(){
     console.log('Server started on port '+port);
 });
-  
+
+module.exports = app;
