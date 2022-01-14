@@ -1,0 +1,8 @@
+1. U cmd pokrenuti komandu "npm install"
+2. Pokrenuti bazu podataka redis
+		Baza je u folderu nazvanom "redis-server 5.0.14/redis-server"
+3. Pokrenuti cmd komandom "node app.js"
+	Ili ako imate nodemon instaliran komandom "nodemon"
+4. Sajt pokrenete na localhost:3000
+
+Nadam se da ce vam se svideti :D
