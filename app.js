@@ -28,8 +28,7 @@ const client = redis.createClient({
     app.set('view engine', 'handlebars');
 
     app.use(express.static(path.join(__dirname, '/public')));
-    // app.use(express.static(path.join('/public')));
-    // app.use(express.static('public'));
+
 
 // body-parser
     app.use(bodyParser.json());
@@ -44,8 +43,6 @@ const client = redis.createClient({
 // Home Page
     app.get('/', function(req, res){
 
-        // client.rPush('todo', "jedan get");
-        // client.rPush('todo', "dva get");
         
         client.lRange('todo', 0, -1, function(err, reply){}
             ).then(reply => {
@@ -107,7 +104,7 @@ const client = redis.createClient({
                         
                 })
                 res.render('game', {name: names, value: value});
-            // res.render('game');
+
         });
 
 
@@ -138,11 +135,7 @@ app.post('/user/game', function(req, res, next){
    
     let score= countPI(pi_value);
     
-    // client.zAdd("scores", ""+score, ""+player_name, function (err, reply) {});
-    // client.zRevRank("scores", player_name, function(err, reply){}
-    //     ).then(reply => {
-    //         res.render('/user/game', {rank: reply});
-    //     });
+
 
     if(player_name === "" || pi_value === ""){
         res.render('game', {
@@ -161,29 +154,25 @@ app.post('/user/game', function(req, res, next){
                     ).then( res =>{
                         
                         scoreFile = res;
-                        // console.log("scoreFile: "+ scoreFile)
-                        // console.log("score: "+ score)
+
                         if(score  > scoreFile){
                             client.hSet('scores', player_name, score, function(err, res){}
                             ).then(()=> {
-                                //console.log('Value is set for player '+ player_name+" to "+ score)
+
                                 })
                                 
                             }
                         });
                     }
                     else{
-                        // console.log('ne postoji')
+
                         
                         client.hSet('scores', player_name, score, function(err, res){}
-                        ).then(()=> {//console.log('New player added '+ player_name+" with score "+ score)
+                        ).then(()=> {
                         })
                     }
                     
-                    // res.render('game', {
-                            
-                    //     resultInputForGame: 'Score for player: '+ player_name+" is "+ score
-                    //     }) 
+
                     
                 })
     }
